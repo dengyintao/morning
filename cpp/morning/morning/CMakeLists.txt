@@ -3,8 +3,10 @@
 #
 cmake_minimum_required (VERSION 3.8)
 
+include_directories("./time")
+
 # 将源代码添加到此项目的可执行文件。
-add_executable (morning "morning.cpp" "morning.h")
+add_executable (morning "morning.cpp" "./mytime/mytime.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET morning PROPERTY CXX_STANDARD 20)
