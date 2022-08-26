@@ -15,9 +15,10 @@ public:
     ~mytime();
 
 public:
-    //返回格式: 2022-08-26
+    //锟斤拷锟截革拷式: 2022-08-26
     static std::string gettime();
     static int diffdays(std::string startday, std::string enday);
+    static std::string format( const char* format, ... );
 };
 
 #endif

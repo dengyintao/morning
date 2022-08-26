@@ -4,7 +4,7 @@
 #include "morning.h"
 
 
-std::string TestHttp( )
+std::string GetWeather( )
 {
     //http://autodev.openspeech.cn/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=郑州
 	httplib::Client cli( "http://autodev.openspeech.cn" );
@@ -19,9 +19,32 @@ std::string TestHttp( )
 	auto res = cli.Get( "/csp/api/v2.1/weather?openId=aiuicus&clientType=android&sign=android&city=郑州",header );
 	if (res->status)
 	{
-		return res->body;
+		Json::Reader reader;
+		Json::Value root;
+    // 解析到root，root将包含Json里所有子元素
+	if (!reader.parse(res->body, root, false))
+	{
+		goto Failed;
 	}
-	return "err";
+		int code = root["code"].asInt();
+		if (code!=0)
+		{
+			std::string err = root["msg"].asString();
+			return err;
+		}
+		else
+		{
+			Json::Value data = root["data"];
+			Json::Value weatherLsit = data["list"];
+			unsigned int count = weatherLsit.size();
+			int temp = weatherLsit[0]["temp"].asInt();
+			std::string info = mytime::format("温度:%d℃",temp);
+			return info;
+		}
+		
+	}
+Failed:
+	return "获取天气信息失败，联系我";
 }
 
 int main()
@@ -31,8 +54,20 @@ int main()
 		std::string enday = mytime::gettime( );
 		int diffday = mytime::diffdays( "2021-06-01", enday );
 		std::cout << "已经过去" << diffday << "天" << std::endl;
-		std::cout << TestHttp( ) << std::endl;
-		Sleep( 1000*10);
+		std::cout << GetWeather( ) << std::endl;
+		httplib::Client cli( "http://api.day.app" );
+		std::string info;
+		info = mytime::format("/VNMDM5dnwHiRbxsAnruoZY/提醒/在一起%d天\n",diffday);
+		auto res = cli.Get(info.c_str());
+		if(res->status)
+		{
+			std::cout<<res->body;
+		}
+		else
+		{
+			std::cout<<res->body;
+		}
+		break;
 	}
 	
 	return 0;
